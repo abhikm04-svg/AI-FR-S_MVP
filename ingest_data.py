@@ -106,13 +106,27 @@ def fetch_and_save_nav(scheme, supabase, mf):
 
 def ingest_history_parallel(supabase, mf):
     """Processes all schemes using multithreading for speed."""
-    try:
-        response = supabase.table("mf_schemes").select("*").execute()
-        schemes = response.data
-    except Exception as e:
-        print(f"❌ Error fetching schemes from Supabase: {e}")
-        return
+    schemes = []
+    batch_size = 1000
+    start = 0
     
+    print(f"📥 Fetching scheme list from Supabase...")
+    while True:
+        try:
+            response = supabase.table("mf_schemes").select("*").range(start, start + batch_size - 1).execute()
+            batch_data = response.data
+            schemes.extend(batch_data)
+            if len(batch_data) < batch_size:
+                break
+            start += batch_size
+        except Exception as e:
+            print(f"❌ Error fetching schemes from Supabase: {e}")
+            break
+    
+    if not schemes:
+        print("⚠️ No schemes found to process.")
+        return
+        
     print(f"🚀 Starting Parallel Ingestion with {MAX_WORKERS} threads for {len(schemes)} schemes...")
     
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
