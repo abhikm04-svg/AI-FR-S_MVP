@@ -1,0 +1,12 @@
+streamlit
+google-generativeai
+yfinance
+pandas
+numpy
+plotly
+nselib
+pandas_market_calendars
+tabulate
+mftool
+deprecated
+pymongo

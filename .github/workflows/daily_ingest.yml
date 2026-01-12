@@ -1,0 +1,33 @@
+name: Daily Mutual Fund Ingestion
+
+on:
+  schedule:
+    # Runs at 06:30 UTC (12:00 PM IST) daily
+    - cron: '30 6 * * *'
+  workflow_dispatch: # Allows manual trigger from the "Actions" tab
+
+jobs:
+  run-ingestion:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10' # Fixes the TypeError by supporting the '|' syntax
+          cache: 'pip'           # Speeds up daily runs by caching dependencies
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run Ingestion Script
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: |
+          python ingest_data.py
