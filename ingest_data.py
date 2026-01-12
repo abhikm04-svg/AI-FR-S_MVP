@@ -63,25 +63,31 @@ def ingest_schemes(supabase, mf):
 def fetch_and_save_nav(scheme, supabase, mf):
     """Worker function: Fetches history for one scheme and saves to DB."""
     code = scheme['scheme_code']
-    last_upd_str = scheme.get('last_updated')
     
-    # Incremental Logic: Skip if updated in last 24 hours
-    if last_upd_str:
-        try:
-            # Handle possible ISO formats or TIMESTAMPTZ from Supabase
-            last_upd = datetime.fromisoformat(last_upd_str.replace('Z', '+00:00'))
-            if datetime.now(last_upd.tzinfo) - last_upd < timedelta(hours=24):
-                return
-        except:
-            pass
+    # Requirement: Always update the last 5 years of data
+    cutoff_date = datetime.now() - timedelta(days=5*365)
 
     try:
         # Fetch historical data via mftool
         data = mf.get_scheme_historical_nav(code)
         
         if data and 'data' in data:
-            nav_data = data['data']
+            raw_nav_data = data['data']
             
+            # Filter for last 5 years
+            nav_data = []
+            for entry in raw_nav_data:
+                try:
+                    # mftool format: DD-MM-YYYY
+                    entry_date = datetime.strptime(entry['date'], '%d-%m-%Y')
+                    if entry_date >= cutoff_date:
+                        nav_data.append(entry)
+                except:
+                    continue
+            
+            if not nav_data:
+                return
+
             # Upsert into NAV history table
             supabase.table("mf_nav_history").upsert({
                 "scheme_code": code,
