@@ -1,4 +1,4 @@
-name: Daily Mutual Fund Ingestion
+name:  Mutual Fund Ingestion
 
 on:
   schedule:
