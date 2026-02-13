@@ -9,4 +9,5 @@ mftool
 supabase
 tqdm
 python-dotenv
+pymongo
 deprecated
