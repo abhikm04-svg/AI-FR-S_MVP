@@ -82,7 +82,7 @@ def fetch_and_save_nav(scheme, supabase, mf):
                     entry_date = datetime.strptime(entry['date'], '%d-%m-%Y')
                     if entry_date >= cutoff_date:
                         nav_data.append(entry)
-                except:
+                except Exception:
                     continue
             
             if not nav_data:
@@ -101,8 +101,8 @@ def fetch_and_save_nav(scheme, supabase, mf):
                 "last_updated": datetime.now().isoformat()
             }).eq("scheme_code", code).execute()
     except Exception as e:
-        # Silently pass or log minimal info to keep the thread pool running
-        pass
+        # Log and continue so one failed scheme does not stop ingestion
+        print(f"⚠️ NAV ingestion failed for scheme {code}: {e}")
 
 def ingest_history_parallel(supabase, mf):
     """Processes all schemes using multithreading for speed."""

@@ -5,8 +5,8 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
-import time
 from datetime import datetime, timedelta
+import os
 
 import nselib
 from nselib import capital_market
@@ -156,10 +156,22 @@ if 'shared_memory' not in st.session_state:
 # ==========================================
 class DatabaseHandler:
     def __init__(self):
-        # Try to get credentials from secrets
-        self.url = st.secrets.get("SUPABASE_URL")
-        self.key = st.secrets.get("SUPABASE_KEY")
-        
+        # Try Streamlit secrets first, then fallback to environment variables for local runs
+        self.url = None
+        self.key = None
+
+        try:
+            self.url = st.secrets.get("SUPABASE_URL")
+            self.key = st.secrets.get("SUPABASE_KEY")
+        except Exception:
+            # st.secrets can throw when no secrets.toml is configured
+            pass
+
+        if not self.url:
+            self.url = os.getenv("SUPABASE_URL")
+        if not self.key:
+            self.key = os.getenv("SUPABASE_KEY")
+
         try:
             if self.url and self.key:
                 self.client: Client = create_client(self.url, self.key)
@@ -254,6 +266,9 @@ class FinancialTools:
 
             # 3. Filter for EQ series and find difference
             # ETFs are usually in EQ series but NOT in the equity list of companies
+            if 'SERIES' not in bhav_df.columns or 'SYMBOL' not in bhav_df.columns:
+                return {}
+
             traded_symbols = set(bhav_df[bhav_df['SERIES'] == 'EQ']['SYMBOL'])
             etf_symbols = traded_symbols - equity_symbols
             
@@ -405,7 +420,8 @@ class FinancialTools:
                     
                     if hist_data:
                         df = pd.DataFrame(hist_data)
-                        df['date'] = pd.to_datetime(df['date'], format='%d-%m-%Y')
+                        df['date'] = pd.to_datetime(df['date'], dayfirst=True, errors='coerce')
+                        df = df.dropna(subset=['date'])
                         df = df.set_index('date').sort_index()
                         df['nav'] = pd.to_numeric(df['nav'])
                         # Rename 'nav' to 'Close' to match yfinance structure
@@ -483,6 +499,8 @@ class FinancialTools:
             # Returns (Absolute)
             current_price = df['Close'].iloc[-1]
             start_price = df['Close'].iloc[0]
+            if start_price == 0:
+                return None
             total_return = (current_price - start_price) / start_price
             
             # Sharpe Ratio (Risk Free Rate ~6%)
@@ -523,7 +541,8 @@ class FinancialTools:
             # Helper for percentages
             def get_pct(key):
                 val = info.get(key)
-                if val is None: return "0.0%"
+                if val is None:
+                    return "N/A"
                 return f"{val * 100:.2f}%"
 
             return {
