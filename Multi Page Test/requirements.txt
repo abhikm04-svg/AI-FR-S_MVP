@@ -1,0 +1,12 @@
+streamlit
+google-generativeai
+yfinance
+pandas
+numpy
+plotly
+nselib
+mftool
+supabase
+tqdm
+python-dotenv
+deprecated

@@ -13,6 +13,31 @@ from nselib import capital_market
 from mftool import Mftool
 from supabase import create_client, Client
 
+class RobustMftool(Mftool):
+    def get_scheme_codes(self, as_json=False):
+        """
+        Overridden to handle malformed lines in AMFI data robustly.
+        """
+        scheme_info = {}
+        url = self._get_quote_url
+        try:
+            response = self._session.get(url)
+            data = response.text.split("\n")
+            for scheme_data in data:
+                if ";" in scheme_data:
+                    scheme = scheme_data.split(";")
+                    # FIX: Check length to prevent IndexError
+                    if len(scheme) >= 4:
+                        scheme_info[scheme[0]] = scheme[3]
+        except Exception as e:
+            print(f"Error fetching scheme codes in RobustMftool: {e}")
+            
+        # Basic implementation of render_response for as_json=False (default)
+        if as_json:
+            import json
+            return json.dumps(scheme_info)
+        return scheme_info
+
 # ==========================================
 # CONFIGURATION & SETUP
 # ==========================================
@@ -196,7 +221,7 @@ class FinancialTools:
     """
     A collection of tools for Indian Market Analysis.
     """
-    mf = Mftool()
+    mf = RobustMftool()
     db = DatabaseHandler() # Initialize DB Handler
 
     @staticmethod
