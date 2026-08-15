@@ -5,8 +5,7 @@ pandas
 numpy
 plotly
 nselib
-pandas_market_calendars
-tabulate
 mftool
+supabase
+python-dotenv
 deprecated
-pymongo
