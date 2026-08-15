@@ -1,0 +1,18 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Secrets
+**/secrets.toml
+.env
+.env.*
+!.env.example
+keys.txt
+
+# Frontend
+UI/node_modules/
+UI/dist/
+
+# OS
+.DS_Store
