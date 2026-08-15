@@ -16,8 +16,11 @@ from sse_starlette.sse import EventSourceResponse
 
 from backend.agents.state import AgentState
 from backend.api.deps import get_graph, get_pool, get_user_id
+from backend.data import market_data
 from backend.data.models import UserPrefs
 from backend.repository import sessions as sessions_repo
+
+PRICE_HISTORY_TOP_N = 5
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
 
@@ -136,6 +139,43 @@ async def get_session_detail(
     return result
 
 
+@router.get("/{session_id}/price-history")
+async def get_price_history(
+    session_id: uuid.UUID,
+    pool: asyncpg.Pool = Depends(get_pool),
+    graph: CompiledStateGraph = Depends(get_graph),
+) -> dict[str, list[dict]]:
+    """Chart-worthy price history for the results page, re-fetched on
+    demand rather than persisted in graph state (plan.md Section 4) --
+    raw per-ticker series were deliberately never stored in the checkpoint.
+    Reuses the same batched read (data.market_data.fetch_market_data ->
+    repository.nav_prices) that fixed the original N+1 bug.
+    """
+    row = await sessions_repo.get_session(pool, session_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    config = {"configurable": {"thread_id": row["thread_id"]}}
+    state = await graph.aget_state(config)
+    metrics = state.values.get("analyzed_metrics", []) if state.values else []
+    top_tickers = [
+        (m.ticker if hasattr(m, "ticker") else m["ticker"]) for m in metrics[:PRICE_HISTORY_TOP_N]
+    ]
+
+    series = await market_data.fetch_market_data(pool, top_tickers)
+
+    result: dict[str, list[dict]] = {}
+    for ticker, close in series.items():
+        if close.empty or close.iloc[0] == 0:
+            continue
+        normalized = (close / close.iloc[0]) * 100
+        result[ticker] = [
+            {"date": idx.strftime("%Y-%m-%d"), "value": round(float(val), 2)}
+            for idx, val in normalized.items()
+        ]
+    return result
+
+
 @router.get("")
 async def list_sessions(
     pool: asyncpg.Pool = Depends(get_pool), user_id: str = Depends(get_user_id)
@@ -155,20 +195,38 @@ async def list_sessions(
 
 @router.get("/{session_id}/stream")
 async def stream_session(
-    session_id: uuid.UUID, pool: asyncpg.Pool = Depends(get_pool)
+    session_id: uuid.UUID,
+    pool: asyncpg.Pool = Depends(get_pool),
+    graph: CompiledStateGraph = Depends(get_graph),
 ) -> EventSourceResponse:
+    """Emits both the coarse analysis_sessions.status (pending/running/
+    completed/failed) and the finer-grained graph node status
+    (researching/analyzing/reporting/done/error) so the frontend can show
+    per-agent progress cards, not just a single spinner.
+    """
+
     async def _events():
-        last_status = None
+        last_payload: Optional[dict] = None
         while True:
             row = await sessions_repo.get_session(pool, session_id)
             if row is None:
                 yield {"event": "error", "data": "session not found"}
                 return
-            status = row["status"]
-            if status != last_status:
-                yield {"event": "status", "data": json.dumps({"status": status})}
-                last_status = status
-            if status in ("completed", "failed"):
+
+            session_status = row["status"]
+            node_status = None
+            if session_status == "running":
+                config = {"configurable": {"thread_id": row["thread_id"]}}
+                state = await graph.aget_state(config)
+                if state.values:
+                    node_status = state.values.get("status")
+
+            payload = {"session_status": session_status, "node_status": node_status}
+            if payload != last_payload:
+                yield {"event": "status", "data": json.dumps(payload)}
+                last_payload = payload
+
+            if session_status in ("completed", "failed"):
                 return
             await asyncio.sleep(1.0)
 

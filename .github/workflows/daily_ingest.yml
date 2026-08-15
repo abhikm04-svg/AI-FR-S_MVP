@@ -17,17 +17,18 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10' # Fixes the TypeError by supporting the '|' syntax
-          cache: 'pip'           # Speeds up daily runs by caching dependencies
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install -r backend/requirements.txt
 
-      - name: Run Ingestion Script
+      - name: Run Ingestion Pipeline
+        working-directory: backend
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
-          python ingest_data.py
+          python -m backend.ingestion.run
