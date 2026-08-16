@@ -19,6 +19,33 @@ describe("AgentProgressCard", () => {
     expect(screen.getByText("Waiting…")).toBeInTheDocument();
   });
 
+  it("shows a live progress indicator only while active", () => {
+    const { rerender } = render(
+      <AgentProgressCard
+        icon="🕵️"
+        name="Chanakya"
+        role="Market Researcher"
+        description="Scans NSE/BSE for stocks, ETFs, and Gold."
+        variant="researcher"
+        state="pending"
+      />,
+    );
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+
+    rerender(
+      <AgentProgressCard
+        icon="🕵️"
+        name="Chanakya"
+        role="Market Researcher"
+        description="Scans NSE/BSE for stocks, ETFs, and Gold."
+        variant="researcher"
+        state="active"
+      />,
+    );
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+    expect(screen.getByText("Working…")).toBeInTheDocument();
+  });
+
   it("shows the error label when state is error", () => {
     render(
       <AgentProgressCard

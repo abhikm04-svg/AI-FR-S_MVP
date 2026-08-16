@@ -10,7 +10,7 @@ import {
   YAxis,
 } from "recharts";
 import type { PricePoint } from "../lib/apiClient";
-import { categoricalColors, chartInk, usePrefersDark } from "../lib/theme";
+import { categoricalColors, chartInk } from "../lib/theme";
 
 interface PerformanceChartProps {
   series: Record<string, PricePoint[]>;
@@ -50,9 +50,11 @@ export function buildChartRows(series: Record<string, PricePoint[]>): ChartRow[]
 }
 
 export function PerformanceChart({ series, names = {} }: PerformanceChartProps) {
-  const isDark = usePrefersDark();
-  const colors = categoricalColors(isDark);
-  const ink = chartInk(isDark);
+  // App is dark-only (Glacier theme, no light variant) -- hardcode dark chart
+  // colors rather than following the OS-level prefers-color-scheme, which
+  // would otherwise mismatch the app's fixed-dark chrome on a light-mode OS.
+  const colors = categoricalColors(true);
+  const ink = chartInk(true);
 
   const tickers = Object.keys(series);
   const rows = useMemo(() => buildChartRows(series), [series]);
@@ -62,9 +64,11 @@ export function PerformanceChart({ series, names = {} }: PerformanceChartProps) 
   }
 
   return (
-    <div className="card">
-      <h3>Comparative Performance (Normalized)</h3>
-      <p style={{ color: ink.secondary, fontSize: "0.9em" }}>
+    <div className="bg-surface-container-low rounded-xl shadow-sm border border-outline-variant/40 p-6 flex flex-col">
+      <h3 className="font-headline font-semibold text-on-surface mb-1">
+        Comparative Performance (Normalized)
+      </h3>
+      <p style={{ color: ink.secondary, fontSize: "0.9em" }} className="mb-4">
         Growth of ₹100 invested at the start of the period.
       </p>
       <ResponsiveContainer width="100%" height={360}>
@@ -72,7 +76,13 @@ export function PerformanceChart({ series, names = {} }: PerformanceChartProps) 
           <CartesianGrid stroke={ink.grid} vertical={false} />
           <XAxis dataKey="date" stroke={ink.muted} tick={{ fontSize: 12 }} minTickGap={32} />
           <YAxis stroke={ink.muted} tick={{ fontSize: 12 }} width={48} />
-          <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)" }} />
+          <Tooltip
+            contentStyle={{
+              background: "var(--color-surface-container-high)",
+              border: "1px solid var(--color-outline-variant)",
+              borderRadius: "var(--radius-DEFAULT)",
+            }}
+          />
           <Legend
             formatter={(value: string) => (
               <span style={{ color: ink.secondary }}>{names[value] ?? value}</span>

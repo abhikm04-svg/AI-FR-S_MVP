@@ -61,6 +61,8 @@ export interface AssetMetrics {
   eps_ttm: string;
   dividend_yield: string;
   expense_ratio: string;
+  // Optional: sessions checkpointed before this field existed may lack it.
+  instrument_type?: string;
 }
 
 export interface SessionDetail extends SessionListItem {

@@ -1,63 +1,59 @@
-/* Design tokens ported from the Streamlit apps' <style> block
-   (Application/app.py, Multi Page Test/shared_lib.py) -- single source now
-   that the duplication between the two Streamlit copies is retired. */
+/* Design tokens: "Instrument Ledger" -- dark-only, built around the three
+   named agent personas (Chanakya/Aryabhata/Tagore) and the astronomy +
+   ledger-book register that fits an India-focused quant/finance tool.
+   Gold (gains/auspicious), jade (analysis), terracotta (the writer) on a
+   near-black indigo ground, warm ivory text instead of pure white. */
 
-:root {
-  --background: oklch(0.9777 0.0041 301.4256);
-  --foreground: oklch(0.3651 0.0325 287.0807);
-  --card: oklch(1.0000 0 0);
-  --card-foreground: oklch(0.3651 0.0325 287.0807);
-  --popover: oklch(1.0000 0 0);
-  --popover-foreground: oklch(0.3651 0.0325 287.0807);
-  --primary: oklch(0.6104 0.0767 299.7335);
-  --primary-foreground: oklch(0.9777 0.0041 301.4256);
-  --secondary: oklch(0.8957 0.0265 300.2416);
-  --secondary-foreground: oklch(0.3651 0.0325 287.0807);
-  --muted: oklch(0.8906 0.0139 299.7754);
-  --muted-foreground: oklch(0.5288 0.0375 290.7895);
-  --accent: oklch(0.7889 0.0802 359.9375);
-  --accent-foreground: oklch(0.3394 0.0441 1.7583);
-  --destructive: oklch(0.6332 0.1578 22.6734);
-  --destructive-foreground: oklch(0.9777 0.0041 301.4256);
-  --border: oklch(0.8447 0.0226 300.1421);
-  --input: oklch(0.9329 0.0124 301.2783);
-  --ring: oklch(0.6104 0.0767 299.7335);
-  --chart-1: oklch(0.6104 0.0767 299.7335);
-  --chart-2: oklch(0.7889 0.0802 359.9375);
-  --chart-3: oklch(0.7321 0.0749 169.8670);
-  --chart-4: oklch(0.8540 0.0882 76.8292);
-  --chart-5: oklch(0.7857 0.0645 258.0839);
-  --radius: 0.5rem;
-  --shadow-sm: 1px 2px 5px 1px hsl(0 0% 0% / 0.06), 1px 1px 2px 0px hsl(0 0% 0% / 0.06);
-}
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: oklch(0.1300 0.0280 261.6920);
-    --foreground: oklch(0.9053 0.0245 293.5570);
-    --card: oklch(0.2544 0.0301 292.7315);
-    --card-foreground: oklch(0.9053 0.0245 293.5570);
-    --popover: oklch(0.6060 0.2500 292.7170);
-    --popover-foreground: oklch(0.9053 0.0245 293.5570);
-    --primary: oklch(0.5410 0.2810 293.0090);
-    --primary-foreground: oklch(0.7230 0.2190 149.5790);
-    --secondary: oklch(0.1300 0.0280 261.6920);
-    --secondary-foreground: oklch(0.9710 0.0130 17.3800);
-    --muted: oklch(0.2560 0.0320 294.8380);
-    --muted-foreground: oklch(0.6974 0.0282 300.0614);
-    --accent: oklch(0.3181 0.0321 308.6149);
-    --accent-foreground: oklch(0.8391 0.0692 2.6681);
-    --destructive: oklch(0.6875 0.1420 21.4566);
-    --destructive-foreground: oklch(0.2166 0.0215 292.8474);
-    --border: oklch(0.3063 0.0359 293.3367);
-    --input: oklch(0.2847 0.0346 291.2726);
-    --ring: oklch(0.7058 0.0777 302.0489);
-    --chart-1: oklch(0.7058 0.0777 302.0489);
-    --chart-2: oklch(0.8391 0.0692 2.6681);
-    --chart-3: oklch(0.7321 0.0749 169.8670);
-    --chart-4: oklch(0.8540 0.0882 76.8292);
-    --chart-5: oklch(0.7857 0.0645 258.0839);
-  }
+@theme {
+  --color-background: #0d0f16;
+  --color-surface: #12141f;
+  --color-surface-container-lowest: #0d0f16;
+  --color-surface-container-low: #12141f;
+  --color-surface-container: #161927;
+  --color-surface-container-high: #1e2233;
+  --color-surface-container-highest: #262b3f;
+  --color-surface-variant: #1e2233;
+
+  --color-on-background: #ece7db;
+  --color-on-surface: #ece7db;
+  --color-on-surface-variant: #a3a2ad;
+
+  --color-outline: #4a4f68;
+  --color-outline-variant: #2a2e42;
+
+  --color-primary: #dba648;
+  --color-on-primary: #1e1404;
+  --color-primary-container: #40320f;
+  --color-on-primary-container: #f3d9a0;
+
+  --color-secondary: #4fae96;
+  --color-on-secondary: #04211b;
+  --color-secondary-container: #123a32;
+  --color-on-secondary-container: #a7ddcd;
+
+  --color-tertiary: #c06a45;
+  --color-on-tertiary: #260f04;
+  --color-tertiary-container: #3f2313;
+  --color-on-tertiary-container: #f0c1a4;
+
+  --color-error: #dd6259;
+  --color-on-error: #250705;
+  --color-error-container: #3d1714;
+  --color-on-error-container: #f4bab4;
+
+  --color-success: #52b788;
+  --color-success-container: #113626;
+
+  --font-headline: "Fraunces", ui-serif, Georgia, serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --radius-DEFAULT: 0.375rem;
+  --radius-lg: 0.625rem;
+  --radius-xl: 0.875rem;
 }
 
 * {
@@ -66,107 +62,203 @@
 
 body {
   margin: 0;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--color-background);
+  color: var(--color-on-background);
+  font-family: var(--font-body);
+  position: relative;
 }
 
-#root {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 24px 16px 64px;
+/* Dot-grid ground, on its own fixed layer so it can breathe (a slow opacity
+   + scale drift) without repainting page content each frame. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -14px;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(circle at 1px 1px, var(--color-outline-variant) 1px, transparent 0);
+  background-size: 28px 28px;
+  animation: dot-grid-breathe 9s ease-in-out infinite;
 }
 
-.agent-box {
-  padding: 20px;
-  border-radius: var(--radius);
-  margin-bottom: 20px;
-  border: 1px solid var(--border);
-  background-color: var(--card);
-  color: var(--card-foreground);
-  box-shadow: var(--shadow-sm);
+@keyframes dot-grid-breathe {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
 }
 
-.agent-title {
-  font-weight: bold;
-  font-size: 1.2em;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+    opacity: 0.85;
+  }
 }
 
-.researcher {
-  border-left: 5px solid var(--chart-1);
+h1,
+h2,
+h3,
+legend {
+  font-family: var(--font-headline);
 }
 
-.analyst {
-  border-left: 5px solid var(--chart-2);
-}
-
-.reporter {
-  border-left: 5px solid var(--chart-3);
-}
-
-.agent-box.pending {
-  opacity: 0.45;
-}
-
-.agent-box.error {
-  border-left-color: var(--destructive);
-}
-
-.card {
-  padding: 16px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background-color: var(--card);
-  color: var(--card-foreground);
-  box-shadow: var(--shadow-sm);
-}
-
-.button-primary {
-  background: var(--primary);
-  color: var(--primary-foreground);
-  border: none;
-  border-radius: var(--radius);
-  padding: 10px 20px;
-  font-size: 1em;
-  cursor: pointer;
-}
-
-.button-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.material-symbols-outlined {
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+  line-height: 1;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
 }
 
 th,
 td {
   text-align: left;
   padding: 8px 12px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-outline-variant);
   font-size: 0.9em;
 }
 
-.nav-bar {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 12px;
+/* Prose (AI thesis body) -- keep headings in the display serif and links in
+   the gold accent so the generated report reads as part of the same system,
+   not the typography plugin's default gray palette. */
+.prose :where(h1, h2, h3, h4) {
+  font-family: var(--font-headline);
+  color: var(--color-on-surface);
 }
 
-.nav-bar a {
-  color: var(--muted-foreground);
-  text-decoration: none;
+.prose :where(a) {
+  color: var(--color-primary);
 }
 
-.nav-bar a.active {
-  color: var(--primary);
-  font-weight: bold;
+.prose :where(strong) {
+  color: var(--color-on-surface);
+}
+
+/* Segmented button group (risk-appetite selector) */
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+  background: var(--color-surface-container-high);
+}
+
+.segmented button {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85em;
+  font-family: var(--font-body);
+  cursor: pointer;
+  color: var(--color-on-surface-variant);
+  white-space: nowrap;
+}
+
+.segmented button.selected {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: 600;
+}
+
+/* Status badges (session history) */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8em;
+  font-weight: 600;
+}
+
+.status-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-badge.status-completed {
+  background: var(--color-success-container);
+  color: var(--color-success);
+}
+
+.status-badge.status-failed {
+  background: var(--color-error-container);
+  color: var(--color-error);
+}
+
+.status-badge.status-running,
+.status-badge.status-pending {
+  background: var(--color-primary-container);
+  color: var(--color-primary);
+}
+
+/* Vertical connector between agent progress cards */
+.stepper-connector {
+  width: 2px;
+  height: 20px;
+  margin-left: 27px;
+  background: var(--color-outline-variant);
+}
+
+/* Agent seal -- the signature motif: a double-ring badge (wax-seal /
+   observatory-dial register) shared by the progress cards and the Results
+   page's "sealed by" credit row, keyed to each agent's accent color via the
+   --seal custom property set inline by the caller. */
+.agent-seal {
+  --seal: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--seal);
+  box-shadow: 0 0 0 3px var(--color-background), 0 0 0 4px var(--color-outline-variant);
+  color: var(--seal);
+  background: var(--color-surface-container-high);
+}
+
+/* Indeterminate progress bar (active agent card) */
+.indeterminate-bar {
+  position: relative;
+  overflow: hidden;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-surface-container-high);
+}
+
+.indeterminate-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  border-radius: 999px;
+  background: var(--color-primary);
+  animation: indeterminate-slide 1.2s ease-in-out infinite;
+}
+
+@keyframes indeterminate-slide {
+  0% {
+    left: -40%;
+  }
+  100% {
+    left: 100%;
+  }
 }

@@ -29,8 +29,8 @@ describe("ProfileSetup", () => {
     const user = userEvent.setup();
     renderWithProviders(<ProfileSetup />);
 
-    await user.click(screen.getByLabelText("Stocks"));
-    await user.click(screen.getByLabelText("Mutual Funds/ETFs"));
+    await user.click(screen.getByRole("button", { name: "Stocks" }));
+    await user.click(screen.getByRole("button", { name: "Mutual Funds/ETFs" }));
 
     expect(screen.getByRole("alert")).toHaveTextContent("Select at least one investment type.");
     expect(screen.getByRole("button", { name: /Analyze Market/ })).toBeDisabled();

@@ -55,6 +55,8 @@ describe("Results", () => {
 
     render(<Results />);
     expect(screen.getByRole("heading", { name: "Executive Summary" })).toBeInTheDocument();
-    expect(screen.getByText("Alpha Fund")).toBeInTheDocument();
+    // Appears twice: once in the Top Recommendations grid, once in the
+    // per-category metrics table.
+    expect(screen.getAllByText("Alpha Fund").length).toBeGreaterThan(0);
   });
 });
