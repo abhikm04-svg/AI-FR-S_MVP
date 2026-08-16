@@ -72,7 +72,10 @@ async def get_nifty500_assets(stock_map: dict[str, str]) -> list[AssetRef]:
     if targets is None:
         targets = list(stock_map.keys())[:500]
 
-    return [AssetRef(ticker=t, name=stock_map.get(t, t.replace(".NS", ""))) for t in targets]
+    return [
+        AssetRef(ticker=t, name=stock_map.get(t, t.replace(".NS", "")), instrument_type="Stocks")
+        for t in targets
+    ]
 
 
 async def get_all_etfs() -> dict[str, str]:
@@ -124,14 +127,14 @@ async def get_asset_universe(
 
     if "Mutual Funds/ETFs" in instruments:
         for ticker, name in (await get_all_etfs()).items():
-            assets[ticker] = AssetRef(ticker=ticker, name=name)
+            assets[ticker] = AssetRef(ticker=ticker, name=name, instrument_type="Mutual Funds/ETFs")
         for code, name in mf_schemes.items():
-            assets[code] = AssetRef(ticker=code, name=name)
+            assets[code] = AssetRef(ticker=code, name=name, instrument_type="Mutual Funds/ETFs")
 
     if "Gold/Commodities" in instruments:
         for ticker, name in (await get_all_etfs()).items():
             if "GOLD" in ticker or "SILVER" in ticker:
-                assets[ticker] = AssetRef(ticker=ticker, name=name)
+                assets[ticker] = AssetRef(ticker=ticker, name=name, instrument_type="Gold/Commodities")
 
     return list(assets.values())
 
@@ -226,7 +229,9 @@ async def fetch_market_data(
 # ---------------------------------------------------------------------------
 
 
-def compute_technical_metrics(ticker: str, name: str, close: pd.Series) -> Optional[AssetMetrics]:
+def compute_technical_metrics(
+    ticker: str, name: str, instrument_type: str, close: pd.Series
+) -> Optional[AssetMetrics]:
     close = close.dropna()
     if close.empty:
         return None
@@ -254,6 +259,7 @@ def compute_technical_metrics(ticker: str, name: str, close: pd.Series) -> Optio
         volatility_pct=round(float(volatility) * 100, 2),
         sharpe_ratio=round(float(sharpe_ratio), 2),
         trend=trend,
+        instrument_type=instrument_type,
     )
 
 

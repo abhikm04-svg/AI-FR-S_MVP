@@ -50,7 +50,7 @@ def _rising_series(n: int, start: float = 100.0, step: float = 0.5) -> pd.Series
 
 def test_compute_technical_metrics_bullish_trend_and_positive_return():
     close = _rising_series(260)
-    metrics = compute_technical_metrics("AAA.NS", "AAA Ltd", close)
+    metrics = compute_technical_metrics("AAA.NS", "AAA Ltd", "Stocks", close)
     assert metrics is not None
     assert metrics.trend == "Bullish"
     assert metrics.return_1y_pct > 0
@@ -58,13 +58,13 @@ def test_compute_technical_metrics_bullish_trend_and_positive_return():
 
 
 def test_compute_technical_metrics_empty_series_returns_none():
-    assert compute_technical_metrics("AAA.NS", "AAA Ltd", pd.Series(dtype=float)) is None
+    assert compute_technical_metrics("AAA.NS", "AAA Ltd", "Stocks", pd.Series(dtype=float)) is None
 
 
 def test_compute_technical_metrics_zero_start_price_returns_none():
     idx = pd.date_range("2023-01-01", periods=5, freq="D")
     close = pd.Series([0.0, 1.0, 2.0, 3.0, 4.0], index=idx)
-    assert compute_technical_metrics("AAA.NS", "AAA Ltd", close) is None
+    assert compute_technical_metrics("AAA.NS", "AAA Ltd", "Stocks", close) is None
 
 
 def test_shape_fundamentals_formats_known_fields():

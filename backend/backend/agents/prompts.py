@@ -11,12 +11,7 @@ from backend.data.models import AssetMetrics, UserPrefs
 def build_report_prompt(metrics: list[AssetMetrics], user_prefs: UserPrefs) -> str:
     top_5 = metrics[:5]
     top_5_context = json.dumps([m.model_dump() for m in top_5])
-    top_3_names = [m.name for m in metrics[:3]]
-    top_3_str = ", ".join(top_3_names)
     current_date = datetime.now().strftime("%B %d, %Y")
-
-    def pick(i: int) -> str:
-        return top_3_names[i] if len(top_3_names) > i else f"Asset {i + 1}"
 
     return f"""
 You are a Senior Investment Strategist for the Indian Market.
@@ -24,10 +19,10 @@ You are a Senior Investment Strategist for the Indian Market.
 **Quantitative Analysis (Top Screened Assets - JSON Format):**
 {top_5_context}
 
-**Top 3 Quantitative Picks:** {top_3_str}
-
 **Task:**
-Generate a structured investment report following the EXACT format below. Do not deviate.
+Generate a structured investment report following the EXACT format below. Do not deviate. The
+UI separately renders a per-category "Top Recommendations" breakdown from the quantitative data
+above, so do NOT enumerate individual ranked picks yourself -- focus on synthesis and strategy.
 
 **Required Output Format:**
 
@@ -39,13 +34,8 @@ Generate a structured investment report following the EXACT format below. Do not
 # **Executive Summary**
 (Max 100 words: Synthesize the strategy tailored to the user's goal.)
 
-# **Top 3 Recommendations (Ranked)**
-1. **{pick(0)}**: (Max 100 words: Focus on selection justification and fundamentals like P/E, ROE.)
-2. **{pick(1)}**: (Max 100 words: Focus on selection justification and fundamentals.)
-3. **{pick(2)}**: (Max 100 words: Focus on selection justification and fundamentals.)
-
 # **Portfolio Strategy**
-(Max 100 words: How these 3 assets fit together.)
+(Max 100 words: How the screened assets fit together as a portfolio.)
 
 # **Indian Market Context**
 (Max 50 words: Relevant factors like Inflation, RBI policies, Sector growth.)
@@ -59,6 +49,5 @@ Generate a structured investment report following the EXACT format below. Do not
 **Constraints:**
 - **Tone:** Formal, professional, encouraging.
 - **Currency:** Use ₹ symbol.
-- **Consistency:** You MUST recommend the Top 3 Quantitative Picks listed above in that exact order.
 - **Data:** Use the provided JSON data accurately.
 """

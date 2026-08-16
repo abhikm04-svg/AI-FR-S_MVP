@@ -24,7 +24,7 @@ RISK_SLABS: dict[str, tuple[float, float]] = {
     "Speculative / High Alpha": (40, 1000),
 }
 
-TOP_N = 20
+TOP_N_PER_CATEGORY = 10
 
 
 def risk_bounds(risk: Union[str, tuple[str, str]]) -> tuple[float, float]:
@@ -43,14 +43,27 @@ def filter_and_rank(
     min_vol, max_vol = risk_bounds(risk)
     filtered = [m for m in metrics if min_vol <= m.volatility_pct <= max_vol]
     filtered.sort(key=lambda m: m.sharpe_ratio, reverse=True)
-    return filtered[:TOP_N]
+    return filtered[:TOP_N_PER_CATEGORY]
+
+
+def _group_by_instrument_type(metrics: list[AssetMetrics]) -> dict[str, list[AssetMetrics]]:
+    groups: dict[str, list[AssetMetrics]] = {}
+    for m in metrics:
+        groups.setdefault(m.instrument_type, []).append(m)
+    return groups
 
 
 async def analyst_node(state: AgentState) -> dict:
     scanned = state["analyzed_metrics"]
     user_prefs = state["user_prefs"]
 
-    top_picks = filter_and_rank(scanned, user_prefs.risk)
+    # Ranked per instrument category (not one flat sort across everything) so
+    # a small category, e.g. 2 gold ETFs, isn't crowded out of the top picks
+    # by a much larger stock/fund pool with higher Sharpe ratios.
+    top_picks: list[AssetMetrics] = []
+    for group in _group_by_instrument_type(scanned).values():
+        top_picks.extend(filter_and_rank(group, user_prefs.risk))
+
     if not top_picks:
         return {
             "analyzed_metrics": [],

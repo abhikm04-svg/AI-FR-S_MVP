@@ -9,6 +9,10 @@ __pycache__/
 .env.*
 !.env.example
 keys.txt
+.mcp.json
+
+# Local Claude Code settings (personal, not shared project config)
+.claude/settings.local.json
 
 # Frontend
 UI/node_modules/

@@ -13,6 +13,7 @@ class AssetRef(BaseModel):
 
     ticker: str
     name: str
+    instrument_type: str
 
 
 class AssetMetrics(BaseModel):
@@ -25,6 +26,10 @@ class AssetMetrics(BaseModel):
     volatility_pct: float
     sharpe_ratio: float
     trend: str
+    # Default covers sessions checkpointed before this field existed (no DB
+    # migration involved -- analyzed_metrics lives only in the LangGraph
+    # checkpoint blob).
+    instrument_type: str = "Other"
 
     market_cap_cr: str = "N/A"
     pe_ratio: str = "N/A"

@@ -24,21 +24,23 @@ def _prefs() -> UserPrefs:
     )
 
 
-def test_prompt_includes_top_3_picks_in_order():
-    metrics = [_metric("A", 2.0), _metric("B", 1.5), _metric("C", 1.0), _metric("D", 0.5)]
+def test_prompt_includes_top_5_in_json_context_but_no_ranked_picks_section():
+    # The UI renders its own deterministic per-category "Top Recommendations"
+    # grid from the quantitative data -- the prompt must not also ask the LLM
+    # for a ranked picks list, which could disagree with it.
+    metrics = [_metric(t, s) for t, s in [("A", 2.0), ("B", 1.5), ("C", 1.0), ("D", 0.5), ("E", 0.2), ("F", 0.1)]]
     prompt = build_report_prompt(metrics, _prefs())
-    assert "**A Fund**" in prompt
-    assert "**B Fund**" in prompt
-    assert "**C Fund**" in prompt
-    assert "**D Fund**" not in prompt  # only top 3 get a ranked bullet; D still appears in the raw JSON context
+    assert '"A Fund"' in prompt  # top 5 present in the raw JSON grounding block
+    assert '"E Fund"' in prompt
+    assert '"F Fund"' not in prompt  # 6th asset excluded, only top 5 passed
+    assert "Top 3 Recommendations" not in prompt
+    assert "# **Top" not in prompt  # no ranked-picks heading of any kind
 
 
 def test_prompt_handles_fewer_than_three_picks():
     metrics = [_metric("A", 2.0)]
     prompt = build_report_prompt(metrics, _prefs())
-    assert "**A Fund**" in prompt
-    assert "**Asset 2**" in prompt
-    assert "**Asset 3**" in prompt
+    assert '"A Fund"' in prompt
 
 
 def test_prompt_includes_user_profile_fields():

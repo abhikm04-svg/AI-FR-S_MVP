@@ -29,7 +29,9 @@ def researcher_node(pool: asyncpg.Pool) -> Callable[[AgentState], Awaitable[dict
             close = price_series.get(asset.ticker)
             if close is None:
                 continue
-            metrics = market_data.compute_technical_metrics(asset.ticker, asset.name, close)
+            metrics = market_data.compute_technical_metrics(
+                asset.ticker, asset.name, asset.instrument_type, close
+            )
             if metrics:
                 scanned.append(metrics)
 
